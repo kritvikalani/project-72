@@ -1,5 +1,5 @@
 import React from 'react';
-import { Text, View, TouchableOpacity, TextInput, Image, StyleSheet, KeyboardAvoidingView} from 'react-native';
+import { Text, View, TouchableOpacity, TextInput, Image, StyleSheet, SafeAreaView} from 'react-native';
 import {Header} from 'react-native-elements';
 import db from '../config'
 import firebase from 'firebase'
@@ -14,67 +14,71 @@ export default class WriteStoryScreen extends React.Component {
             story: ''
         }
     }
-    submitStory = async () =>{
-    var titleRef = await db.collection("title").where({'name': this.state.title})
-    /*titleRef.docs.map((doc)=>{
-        var title = doc.data()
-    })*/
-
-    var authorRef = await db.collection("author").where({'name': this.state.author})
-    /*authorRef.docs.map((doc)=>{
-        var author = doc.data()
-    })*/
-
-    var storyRef = await db.collection("story").add({'story': this.state.story})
-    /*storyRef.docs.map((doc)=>{
-        var story = doc.data()
-    })*/
-    var storySubmitted =  await this.submitStory()
-    if(storySubmitted){
-        Alert.alert("Story submitted successfully")
-      }
+    submitStory = () =>{
+        db.collection("stories").add({
+            title: this.state.title,
+            author: this.state.author,
+            story: this.state.story
+        })
+        this.setState({author: '', story: '', title: ''})
 }
     render(){
         return(
-            <KeyboardAvoidingView style={styles.container} behavior="padding" enabled>
+            <SafeAreaView>
             <View>
+                <Header
+                backgroundColor= {"pink"}
+                centerComponent= {{
+                    text: "Story Hub",
+                    style: {
+                        color: 'white',
+                        fontSize: 20,
+                        justifyContent: 'center'
+                    }
+                }}
+                />
            <View>
                <TextInput
-               style={StyleSheet.inputBox}
+               style={styles.inputBox}
                placeholder="Title of the Story"
                 onChangeText={text => {
-                    this.setState ({text: text})
+                    this.setState ({title: text})
                 }}
+                value = {this.state.title}
                />
            </View> 
            <View>
                <TextInput
                multiline= {true}
-               style={StyleSheet.inputBox}
+               style={styles.inputBox}
                placeholder="Author of the Story"
                 onChangeText={text => {
-                    this.setState ({text: text})
+                    this.setState ({author: text})
                 }}
+                value = {this.state.author}
                />
            </View>
            <View>
                <TextInput
-               style={StyleSheet.inputBox}
+               style={styles.inputBox}
                placeholder="Write Story"
                 onChangeText={text => {
-                    this.setState ({text: text})
+                    this.setState ({story: text})
                 }}
+                value = {this.state.story}
                />
            </View>
            <View>
                <TouchableOpacity>
                style={styles.submitButton}
-               onPress = {this.submitStory}
+               onPress = {()=>{
+                   this.submitStory()
+               }} 
           <Text style={styles.submitButtonText}>Submit</Text>
                </TouchableOpacity>
            </View>
            </View>
-           </KeyboardAvoidingView>
+           </SafeAreaView>
         )
     }
 }
